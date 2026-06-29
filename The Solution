@@ -1,0 +1,8 @@
+## The Solution
+To solve this, we can modify the Context Precision metric to work with continuous relevance scores instead of binary yes/no labels. 
+Instead of marking a chunk as relevant (1) or not relevant (0), we assign it a score between 0 and 1. This score can represent a confidence percentage, a cross-encoder model score, or a similarity score. For example, a highly relevant chunk might get a 0.95, while a somewhat relevant chunk gets a 0.5.
+The calculation works like this:
+First, we calculate a running average of relevance scores up to each position in the list. For example, at position 1, it is just the first score. At position 2, it is the average of the first and second scores.
+Second, we multiply the running average at each position by the relevance score of that position, and add them all together to get a raw score.
+Finally, we calculate what the raw score would be if the same chunks were sorted perfectly (with the highest scores first). We divide our actual raw score by this ideal score. This gives us a normalized final score between 0.0 and 1.0.
+Because of this normalization, if the RAG system ranks the chunks in the correct order, the score is a perfect 1.0. If it places a less relevant chunk before a more relevant one, the score drops, penalizing the ordering mistake.
